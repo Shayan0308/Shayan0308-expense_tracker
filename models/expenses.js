@@ -5,7 +5,7 @@ const {
 module.exports = (sequelize, DataTypes) => {
   class expenses extends Model {
     static associate(models) {
-      this.belongsTo(models.users,{ foreignKey:'user_id' });
+      this.belongsTo(models.users, { foreignKey: 'user_id' });
     }
   }
   expenses.init({
@@ -45,13 +45,16 @@ module.exports = (sequelize, DataTypes) => {
       allowNull: false,
       defaultValue: Date.now(),
     },
-    isDelete:{
+    isDelete: {
       type: DataTypes.BOOLEAN,
-      defaultValue:false
+      defaultValue: false
     }
   }, {
     sequelize,
+    timestamps: true,
     modelName: 'expenses',
+    createdAt: 'created_at',
+    updatedAt: 'updated_at'
   });
   return expenses;
 };

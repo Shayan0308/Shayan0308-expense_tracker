@@ -11,10 +11,8 @@ exports.register = async (req, res, next) => {
     const userDetail = await users.create(payload);
     const { user, error } = await supabase.auth.signUp({
       email: payload.email,
-      password: userDetail.password,
+      password: payload.password,
     });
-    console.log("Registration Error ========>",error);
-    console.log("Registration USER ========>",user);
     if (error) throw createError(error.message);
     return res.status(200).json({ message: "User Registered Successfully !!", User: userDetail.email });
   } catch (error) {
@@ -29,13 +27,13 @@ exports.login = async (req, res, next) => {
     const isEmailExisted = await users.findOne({ where: { email: payload.email, isDelete: false } });
     if (!isEmailExisted) throw createError(404, 'User Not Found');
 
-    const { user, error } = await supabase.auth.signUp({
-      email: isEmailExisted.email,
-      password: isEmailExisted.password,
-    });
-    console.log("Login Error ========>",error);
+    const {data, error} = await supabase.auth.signInWithPassword({
+      email: payload.email,
+      password: payload.password,
+    })
     if (error) throw createError(error.message);
-    return res.status(200).json({ message: "User Registered Successfully !!", User: user.email });
+
+    return res.status(200).json({ message: "User Registered Successfully !!", Data: data });
   } catch (error) {
     next(error);
   }

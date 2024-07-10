@@ -1,26 +1,18 @@
 const supabase = require('../utils/supabase');
+const jwt = require('jsonwebtoken')
+const { users } = require("../models");
+const createError = require('http-errors');
 
 exports.auth = async (req, res, next) => {
-    // Get the current user session
-    const session = supabase.auth.session();
+    try {
+        const token = req.headers.authorization?.split(" ")[1];
+        if (!token) throw createError(401, "Unauthorized");
 
-    // Handle authentication state changes
-    supabase.auth.onAuthStateChange((event, session) => {
-        if (event === 'SIGNED_IN') {
-            console.log('User signed in:', session.user);
-        } else if (event === 'SIGNED_OUT') {
-            console.log('User signed out');
-        }
-    });
-		console.log("SESSION ============> ",session);
-    // Example usage
-    if (session) {
-        console.log('User is logged in:', session.user);
-    } else {
-        console.log('User is not logged in');
+        const decodedToken = jwt.decode(token);
+        const isEmailExisted = await users.findOne({ where: { email: decodedToken.email, isDelete: false }, attributes: ['id'] });
+        req.user_id = isEmailExisted.id;
+        next();
+    } catch (error) {
+        next(error);
     }
-		// const isEmailExisted = await users.findOne({ where: { email: payload.email, isDelete: false } });
-		// req.user = user;
 }
-
-

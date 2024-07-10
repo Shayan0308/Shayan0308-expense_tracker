@@ -2,7 +2,6 @@ const Joi = require("joi");
 
 exports.create = {
 	body: Joi.object({
-		user_id: Joi.number().integer().required(),
 		amount: Joi.number().required(),
 		description: Joi.string().allow(null).optional(),
 		date:Joi.date().allow(null),
